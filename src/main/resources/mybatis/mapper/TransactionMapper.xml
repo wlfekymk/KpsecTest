@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kpsec.repository.mapper.TransactionRepositoryMapper">
+
+	<select id="getSumMaxTotalData" resultType="com.kpsec.model.dto.TransactionGetSumMaxTotalData">
+		SELECT    
+			t2.year, t1.account_name as name, t1.account_no as accNo, T2.sumAmt 
+	   	FROM    
+	   		account AS t1, 	(  
+		   	    (  
+		   		    SELECT  
+		   	 		    SUBSTRING(transaction_date, 1, 4) as year, account_no, SUM(price-fees) as sumAmt  
+		   		    FROM  
+		   			    transaction  
+		   		    WHERE 	
+		   			    cancelyn = 'N' AND transaction_date LIKE '2018%'  
+		   			GROUP BY   
+		   			    SUBSTRING(transaction_date, 1, 4), account_no  
+		   		    ORDER BY 	sumAmt DESC LIMIT 1
+		   		)  
+		   		UNION  
+		   		(  
+		   			SELECT  
+		   		 		SUBSTRING(transaction_date, 1, 4) as year, account_no, SUM(price-fees) as sumAmt  
+		   			FROM  
+		   				transaction  
+		   			WHERE 	
+		   				cancelyn = 'N' AND transaction_date LIKE '2019%'  
+		   			GROUP BY  
+		   			    SUBSTRING(transaction_date, 1, 4), account_no  
+		   		    ORDER BY sumAmt DESC LIMIT 1  
+		   		)  
+		   	) as t2  
+	   	WHERE t1.account_no = t2.account_no
+	</select>
+	
+	<select id="getNotTransClientData" resultType="com.kpsec.model.dto.TransactionGetNotTransClientData">
+		SELECT	'2018' as year, account_no as accNo, account_name as name  
+		FROM	account  
+	   	WHERE   account_no not in (  
+	   		    	SELECT 	
+	   			    	account_no  
+	   				FROM 	
+	   					transaction  
+	   				WHERE 	
+	   					cancelyn = 'N' AND transaction_date like '2018%'  
+	   		   		GROUP BY 
+	   		        	account_no  
+	   			)  
+	   	UNION  
+	   	SELECT	'2019' as year, account_no as accNo, account_name as name  
+	   	FROM    account  
+	   	WHERE   account_no not in (  
+	   		    	SELECT 	
+	   					account_no  
+   			    	FROM 	
+	   					transaction  
+			    	WHERE 	
+	   					cancelyn = 'N' AND transaction_date like '2019%'  
+	   		   		GROUP BY  
+	   		   		    account_no
+	   			)  
+	</select>
+	
+	<select id="getBranchSumAmtByYearData" parameterType = "long" 
+		resultType="com.kpsec.model.dto.TransactionGetBranchSumAmtData">
+		SELECT     
+   		    b.branch_code as brCode, c.branch_name as brName, sum(price-fees) as sumAmt
+   		FROM 
+   		    transaction a, account b, branch c
+   		WHERE  
+   		    a.account_no = b.account_no  
+   		    AND b.branch_code  = c.branch_code  
+   		    AND a.cancelyn = 'N'  
+   		    AND a.transaction_date like CONCAT(#{year}, '%') 
+   		GROUP BY  
+   		    b.branch_code  
+   		ORDER BY  
+   		    sum(price-fees) DESC 
+	</select>
+
+	<select id="getYearData" resultType="long">
+		SELECT
+			substring(transaction_date, 1,4) as year
+		FROM
+			transaction GROUP BY substring(transaction_date, 1,4)
+	</select>
+
+
+	
+	<select id="getBranchSumAmtByBrNameData" parameterType="string"
+		resultType="com.kpsec.model.dto.TransactionGetBranchSumAmtData">
+ 		SELECT  
+	   		b.branch_code as brCode, c.branch_name as brName, sum(price-fees) as sumAmt  
+	   	FROM  
+	   	    transaction a, account b, branch c  
+	   	WHERE  
+	   	    a.account_no = b.account_no  
+	   	    AND b.branch_code  = c.branch_code  
+	   	    AND a.cancelyn = 'N'  
+	   	    AND c.branch_name = #{brName}  
+	   	GROUP BY  
+	   	    b.branch_code  
+	   	ORDER BY  
+	   	    sum(price-fees) DESC 
+	</select> 
+
+</mapper>
