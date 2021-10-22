@@ -9,7 +9,7 @@
   com.kpsec.service : 프로젝트의 서비스 구현 패키지	
   com.kpsec.util : 프로젝트의 UTIL 패키지
   com.kpsec.common : 공통 로깅 설정 및 AOP 사용
-
+  
 2. 과제 1 특정 고객 거래내역 조회 서비스 개발
   ㅇ 고객 거래내역 데이터(첨부)
   ㅇ 고객 데이터(첨부)
@@ -17,6 +17,7 @@
   ㅇ 데이터는 CSV 파일로 각 레코드에 컬럼값은 ‘,’ 구분자로 저장이 되어 있습니다.
   ㅇ in memory DB에 테이블 구성 및 데이터를 Insert 하여 구성한다.
      - com.kpsec.init.initData.java sample를 참고하여, JPA를 이용한 DB2에 테이블 구성 및 데이터를 Insert 함
+  
   
   ㅇ 기본 제약사항(필수)
      -  API 기능명세에서 기술된 API를 모두 개발하세요.
