@@ -58,7 +58,7 @@ public class algorithm2 {
 //		arrayInit(7, 5, "1,0,0,0,0,0,1,2,0,0,0,0,3,0,2,0,9,0,0,0,0,0,3,0,5,4,0,0,1,0,2,3,0,0,6");
 	}
 
-	public static void arrayInit(int x, int y, String s) {
+	public static int arrayInit(int x, int y, String s) {
 		System.out.println("=================================");
 		String[][] arr = new String[y][x];
 		String[] array = s.split(",");
@@ -71,35 +71,28 @@ public class algorithm2 {
 			}
 		}
 		System.out.println("=================================");
-		sumGame(x, y, arr);
+		return sumGame(x, y, arr);
 	}
 
 	
 
-	public static void sumGame(int x, int y, String[][] arr) {
+	public static int sumGame(int x, int y, String[][] arr) {
 
 		int[] moves = { -1, 0, 1 }; 	// 이동가능 위치
 		// y값이 0이 될때까지 반복
 		// 초기 좌표
-		int neoX = y - 1; 			// 왼쪽 상단
+		int X = y - 1; 				// 왼쪽 상단
 		int neoY = 0; 				// 왼쪽 상단  3,0 -> 2,0 -> 1,0 -> 0,0
-		int frodoX = y - 1; 		// 오른쪽 상단
 		int frodoY = x - 1; 		// 오른쪽 상단
-		System.out.println("neo 시작 좌표 : " + neoX + "," + neoY + " >> 시작 값 : " + arr[neoX][neoY]);
-		y=y-1;
-
-		int neoSumTop = 0;
-		int frodoSumTop = 0;
-
-		int total = Integer.valueOf(arr[neoX][neoY]);
-		for (; y > 0; y--) {
-			System.out.println("y : " + y);
-			neoX = y - 1; 			// y값이 감소하면 끝
-			// 재귀호출 필요
-			// neoY는 move 가능영역을 돌아야함 단 neoY가 0보다 작을순 없다
-			recCall(neoX, neoY, arr, total);
-			// System.out.println("frodo 현재 좌표 : " + frodoX + "," + frodoY + " >> 현재 값 : " + arr[frodoX][frodoY]);
-		}		
+		System.out.println(X + "층");
+		System.out.println("neo 시작 좌표 : " + X + "," + neoY + " >> 시작 값 : " + arr[X][neoY]);
+		System.out.println("frodo 시작 좌표 : " + X + "," + frodoY + " >> 시작 값 : " + arr[X][frodoY]);
+		int total = Integer.valueOf(arr[X][neoY]) + Integer.valueOf( arr[X][frodoY]);
+		
+		
+		total = total + recCall(X-1, neoY, frodoY, arr, 0);
+		
+		return total;
 	}
 	/**         -------- 
 	 *         2 1 1 
@@ -111,28 +104,72 @@ public class algorithm2 {
 	 *         3 1 1 
 	 *         --------
 	 **/
-	// 재귀호출
-	public static int recCall(int neoX, int neoY, String[][] arr, int total) {
+	
+	/**
+	 * 맨윗층을 제외한 아래층의 최고합산을 리턴하는 재귀호출이 나와야함
+	 * @param neofrodoX 초기 네오 프로도 위치 
+	 * @param neoY 
+	 * @param frodoY
+	 * @param arr
+	 * @param total 맨윗층을 제외한 아랫층 최고합산 
+	 * @return
+	 */
+	public static int recCall(int X, int neoY, int frodoY, String[][] arr, int max) {
+		int result = 0;
 		int top = 0;
 		int[] moves = { -1, 0, 1 }; // 이동가능 위치
-		for (int move : moves) {
-			int now = neoY + move;
+		int sum = 0;  //중간 저장
+		for (; X >= 0; X--) {
+			System.out.println(X + "층");
+			int neoYnow = 0;
+			int frodoYnow = 0;
+			
+			//아래로 이동 가능 좌표를 루프 돌면서
+			for (int neoMove : moves) {
+				neoYnow = neoY + neoMove;
+				// 네오의 말이 말판 밖으로 나가는지 확인 
+				if(neoYnow >=0 && neoYnow <= frodoY){
+					System.out.println("======================================");
+					System.out.println("neo 현재 좌표 : " + X + "," + neoYnow + " >> 현재 값 : " + arr[X][neoYnow]);
+	
+					for(int frodoMove : moves) {
+						frodoYnow = frodoY + frodoMove;
 
-			if (now >= 0) {
-
-				if (neoX >= 0) {
-					System.out.println("neoY : " + now);
-					System.out.println("neo 현재 좌표 : " + neoX + "," + now + " >> 현재 값 : " + arr[neoX][now]);
-					total = total + Integer.valueOf(arr[neoX][now])  ;
-					System.out.println("total : "+ total );
-					
-					if(top<total) {
-						top= total;
+						// 프로도의 말이 말판 밖으로 나가는지 확인 
+						if(frodoYnow <= frodoY && frodoYnow >=0 ) { 
+							System.out.println("frodo 현재 좌표 : " + X + "," + frodoYnow + " >> 현재 값 : " + arr[X][frodoYnow]);
+							
+							// 두말이 같은 같으로 이동할수 있지만 점수는 한명에만 주어진다
+							if (neoYnow == frodoYnow) 
+								result = max + Integer.valueOf(arr[X][neoYnow]);
+							else
+								result = max + Integer.valueOf(arr[X][neoYnow]) + Integer.valueOf(arr[X][frodoYnow]);
+							
+							System.out.println("현재 합산 : " +sum);
+							
+							int total = recCall(X-1, neoYnow, frodoYnow, arr, sum);
+							
+							if(top>total) {
+								return top;
+							}
+							/**         -------- 
+							 *         2 1 1 
+							 *         -------- 
+							 *         1 5 5 
+							 *         -------- 
+							 *         2 5 1 
+							 *         -------- 
+							 *         3 1 1 
+							 *         --------
+							 **/	
+						}
 					}
-					total = recCall(neoX - 1, now, arr, total);
 				}
 			}
 		}
-		return total;
+		
+		return result;
 	}
+
+
 }

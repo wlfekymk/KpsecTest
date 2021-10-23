@@ -54,9 +54,16 @@
    	4.  API 방식 : PUT 데이터 이관, POST 이관후 데이터 입력을 받아 조회
    
 README.md 파일을 추가하여, 개발 프레임웍크, 문제해결 방법, 빌드 및 실행 방법을 기술하세요.
-
-
-       
+ - 빌드 및 실행 방법 
+    eclipse기준 : 프로젝트 우클릭 -> maven -> maven update 의존성 라이브러리가 다 받아지면 
+                  프로젝트 우클릭 -> RUN AS -> MAVEN BUILD.. -> goals : package 실행
+                  프로젝트 경로\target\ 에 homework-"<versern>".war로 생성 
+                  간단히 실행시 의존성 라이브러리가 모두 build된 파일 java -jar 파일명으로 실행
+3. 과제 2 코딩 문제
+   - com.kpsec.algorithm.algorithm1 에 개발
+      완성
+   - com.kpsec.algorithm.algorithm2 에 개발
+      시간 부족으로 완성 못함
       
   
   
